@@ -13,8 +13,8 @@
    :identity :assassin
    ;; Each word should have an x, y coordinate from [0 0] to [4 3]
    :position [0 1]
-   ;; Each word should have a status, :visible or :hidden, default :hidden
-   :status :hidden
+   ;; Each word should have a :revealed? status, true or false, default false.
+   :revealed? false
    })
 
 (def dictionary (-> "resources/original.txt" slurp str/split-lines))
@@ -39,26 +39,27 @@
   []
   (let [alliances (set-alliances)
         coordinates (shuffle (for [x (range 5) y (range 5)] (vector x y)))
-        status (repeat 25 :hidden)
-        mapper (fn [[i c s w]] {:word w
-                               :identity i
-                               :position c
-                               :status s})]
+        mapper (fn [[id coord wd]] {:word wd
+                                   :identity id
+                                   :revealed? false
+                                   :position coord})]
     (->> dictionary
          shuffle
          (take 25)
-         (interleave alliances coordinates status)
-         (partition 4)
+         (interleave alliances coordinates)
+         (partition 3)
          (map mapper))))
 
 (defn hidden?
   [m]
-  (= (:status m) :hidden))
+  (= (:revealed? m) false))
 
 (defn reveal-word
   [map]
   {:pre [(hidden? map)]}
-  (assoc map :status :visible))
+  (assoc map :revealed? true))
+
+(def game (prepare-game))
 
 (defn -main
   "I don't do a whole lot ... yet."
