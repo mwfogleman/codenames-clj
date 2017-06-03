@@ -2,16 +2,16 @@
   (:require [codenames.dictionaries :as dictionaries]
             [clj-time.core :as t]))
 
+(def teams [:red :blue])
+
 (defn set-alliances
   "In each game, there should be: 1 :assassin, 9 of the starting team (e.g., :red), 8 of the next team (e.g., :blue), and 7 civilians (:neutral). Return a sequence with those amounts of the keywords, as well as a map that says who the starting team is."
   []
-  (let [teams [:red :blue]
-        order (shuffle teams)
-        f (first order)
-        s (second order)
-        m {:starting-team f}]
-    (cons m (reduce concat [(repeat 9 f)
-                            (repeat 8 s)
+  (let [[fst snd] (shuffle teams)
+        m {:starting-team fst
+           :current-team fst}]
+    (cons m (reduce concat [(repeat 9 fst)
+                            (repeat 8 snd)
                             (repeat 7 :neutral)
                             [:assassin]]))))
 
