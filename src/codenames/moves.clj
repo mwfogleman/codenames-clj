@@ -27,10 +27,22 @@
   (setval [ATOM :words (filterer #(word-filterer word %)) ALL :revealed?]
           true g))
 
-(defn next-turn! [game]
+(defn next-round! [game]
   (transform [ATOM :round] inc game))
+
+(defn switch-teams! [game]
+  (letfn [(switcher [team] (if (= team :red)
+                             :blue
+                             :red))]
+    (transform [ATOM :current-team] switcher game)))
+
+(defn next-turn! [game]
+  (next-round! game)
+  (switch-teams! game))
+
+(defn win! [game]
+  (let [current-team (first (select [ATOM :current-team] game))]
+    (setval [ATOM :winning-team] current-team game)))
 
 ;; Functions to Implement:
 ;; check-winning-condition
-;; change-teams
-;; current-team
