@@ -27,8 +27,10 @@
   (setval [ATOM :words (filterer #(word-filterer word %)) ALL :revealed?]
           true g))
 
+(defn next-turn! [game]
+  (transform [ATOM :round] inc game))
+
 ;; Functions to Implement:
-;; next-turn!
 ;; check-winning-condition
 ;; change-teams
 ;; current-team
