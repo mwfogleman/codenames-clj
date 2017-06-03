@@ -4,7 +4,7 @@
             [codenames.words :as words])
   (:gen-class))
 
-(def a-game (game/prepare))
+(def a-game (game/prepare-game))
 
 (defn -main
   "I don't do a whole lot ... yet."

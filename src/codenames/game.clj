@@ -10,26 +10,34 @@
   (let [teams [:red :blue]
         order (shuffle teams)
         f (first order)
-        s (second order)]
-    (reduce concat [(repeat 9 f)
-                    (repeat 8 s)
-                    (repeat 7 :neutral)
-                    [:assassin]])))
+        s (second order)
+        m {:starting-team f}]
+    (cons m (reduce concat [(repeat 9 f)
+                            (repeat 8 s)
+                            (repeat 7 :neutral)
+                            [:assassin]]))))
 
-(defn prepare
+(defn get-words
+  []
+  (->> dictionaries/dictionary
+       shuffle
+       (take 25)))
+
+(defn prepare-game
   "Creates a new game of CODENAMES."
   []
-  {:post [(= 25 (count %))]}
-  (let [alls (set-alliances)
-        coords (shuffle (for [x (range 5) y (range 5)] (vector x y)))
-        mapper (fn [[id coord wd]] {:word wd
-                                   :identity id
-                                   :revealed? false
-                                   :position coord})]
-    (->> dictionaries/dictionary
-         shuffle
-         (take 25)
-         (interleave alls coords)
-         (partition 3)
-         (map mapper))))
+  (let [[m & alliances] (set-alliances)
+        ;; I think I can do coordinates by order in the sequence, with partition-by or even without it
+        ;; coords (shuffle (for [x (range 5) y (range 5)] (vector x y))) 
+        mapper (fn [[id wd]] {:word wd
+                             :identity id
+                             :revealed? false
+                             ;; :position coord
+                             })]
+    (->> (get-words)
+         (interleave alliances)
+         (partition 2)
+         (map mapper)
+         (hash-map :words)
+         (into m))))
 
