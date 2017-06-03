@@ -1,11 +1,9 @@
 (ns codenames.game
-  (:require [codenames.dictionaries :as dictionaries]))
-
-;; 9 red 8 blue, or 9 blue 8 red
-;; whoever has 9 goes first
+  (:require [codenames.dictionaries :as dictionaries]
+            [clj-time.core :as t]))
 
 (defn set-alliances
-  "In each game, there should be: 1 :assassin, 9 of the starting team (e.g., :red), 8 of the next team (e.g., :blue), and 7 civilians (:neutral)."
+  "In each game, there should be: 1 :assassin, 9 of the starting team (e.g., :red), 8 of the next team (e.g., :blue), and 7 civilians (:neutral). Return a sequence with those amounts of the keywords, as well as a map that says who the starting team is."
   []
   (let [teams [:red :blue]
         order (shuffle teams)
@@ -26,7 +24,12 @@
 (defn prepare-game
   "Creates a new game of CODENAMES."
   []
-  (let [[m & alliances] (set-alliances)
+  (let [[alliance-map & alliances] (set-alliances)
+        metadata-init {:winning-team nil
+                       :id (str (gensym))
+                       :created-at (t/now)
+                       :round 0}
+        metadata (merge alliance-map metadata-init)
         ;; I think I can do coordinates by order in the sequence, with partition-by or even without it
         ;; coords (shuffle (for [x (range 5) y (range 5)] (vector x y))) 
         mapper (fn [[id wd]] {:word wd
@@ -39,5 +42,6 @@
          (partition 2)
          (map mapper)
          (hash-map :words)
-         (into m))))
+         (into metadata)
+         (atom))))
 
