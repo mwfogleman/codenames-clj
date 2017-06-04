@@ -15,17 +15,13 @@
     (in? words word)))
 
 (defn revealed? [game word]
-  {:pre [(valid-word? game word)]}
-  (first (select [ATOM :words (filterer #(word-filterer word %)) ALL :revealed?] game)))
+  (select-any [ATOM :words (filterer #(word-filterer word %)) ALL :revealed?] game))
 
 (def hidden? (complement revealed?))
 
 (defn reveal! [game word]
-  {:pre [(valid-word? game word)
-         (hidden? game word)]}
-  ;; check that the word hasn't already been revealed
   (setval [ATOM :words (filterer #(word-filterer word %)) ALL :revealed?]
-          true g))
+          true game))
 
 (defn next-round! [game]
   (transform [ATOM :round] inc game))
@@ -45,13 +41,13 @@
 (defn win!
   "Makes the current team win the game."
   [game]
-  (let [winner (first (select [ATOM :current-team] game))]
+  (let [winner (select-any [ATOM :current-team] game)]
     (setval [ATOM :winning-team] winner game)))
 
 (defn lose!
   "Makes the current team lose the game."
   [game]
-  (let [loser (first (select [ATOM :current-team] game))
+  (let [loser (select-any [ATOM :current-team] game)
         winner (opposite-team loser)]
     (setval [ATOM :winning-team] winner game)))
 
