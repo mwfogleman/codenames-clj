@@ -31,7 +31,7 @@
                        :round 0}
         metadata (merge alliance-map metadata-init)
         ;; I think I can do coordinates by order in the sequence, with partition-by or even without it
-        ;; coords (shuffle (for [x (range 5) y (range 5)] (vector x y))) 
+        ;; coords (shuffle (for [x (range 5) y (range 5)] (vector x y)))
         mapper (fn [[id wd]] {:word wd
                              :identity id
                              :revealed? false
@@ -41,6 +41,7 @@
          (interleave alliances)
          (partition 2)
          (map mapper)
+         (shuffle)
          (hash-map :words)
          (into metadata)
          (atom))))
